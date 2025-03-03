@@ -1,0 +1,40 @@
+name: Procesar imágenes y subirlas a Azure
+
+on:
+  push:
+    paths:
+      - "images/**"
+    branches:
+      - main
+
+jobs:
+  process_images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Configurar variables
+        run: |
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" >> .env
+          echo "AZURE_STORAGE_CONTAINER_NAME_SOURCE=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_SOURCE }}" >> .env
+          echo "AZURE_STORAGE_CONTAINER_NAME_RAW=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_RAW }}" >> .env
+          echo "AZURE_STORAGE_CONTAINER_NAME_OPTIMIZED=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_OPTIMIZED }}" >> .env
+          echo "AZURE_STORAGE_SAS_TOKEN=${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" >> .env
+          echo "AZURE_STORAGE_BLOB_URL=${{ secrets.AZURE_STORAGE_BLOB_URL }}" >> .env
+
+      - name: Ejecutar procesamiento de imágenes
+        run: |
+          node scripts/download.js
+          node scripts/resize.js
+          node scripts/optimize.js
+          node scripts/upload.js

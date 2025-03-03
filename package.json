@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@azure/storage-blob": "^12.26.0",
+    "dotenv": "^16.4.7",
+    "fs": "^0.0.1-security",
+    "sharp": "^0.33.5"
+  }
+}

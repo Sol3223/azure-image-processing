@@ -1,0 +1,2 @@
+## Excluyo el archivo .env para que no se suba al github, nos e deben subir las claves del .env
+.env
