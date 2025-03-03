@@ -1,11 +1,8 @@
 name: Procesar imágenes y subirlas a Azure
 
 on:
-  push:
-    paths:
-      - "imagenes/**"
-    branches:
-      - main
+  repository_dispatch:
+    types: [blob_created]  # Evento personalizado que activará el workflow
 
 jobs:
   process_images:

@@ -4,33 +4,42 @@ const fs = require('fs');
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const sourceContainerName = process.env.AZURE_STORAGE_CONTAINER_NAME_SOURCE;
-const rawContainerName = process.env.AZURE_STORAGE_CONTAINER_NAME_RAW;
 const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN;
 const blobServiceClient = new BlobServiceClient(`${process.env.AZURE_STORAGE_BLOB_URL}?${sasToken}`);
 
-async function downloadImages() {
+async function downloadLatestBlob() {
     try {
-        const sourceContainerClient = blobServiceClient.getContainerClient(sourceContainerName);
-        console.log(`📥 Descargando imágenes desde ${sourceContainerName} a ${rawContainerName}...`);
+        console.log("📥 Buscando la última imagen en", sourceContainerName);
 
-        for await (const blob of sourceContainerClient.listBlobsFlat()) {
-            const blobName = blob.name;
-            const blockBlobClient = sourceContainerClient.getBlockBlobClient(blobName);
-            const downloadResponse = await blockBlobClient.download(0);
-            
-            const filePath = `./${blobName}`;
-            const fileStream = fs.createWriteStream(filePath);
-            await new Promise((resolve, reject) => {
-                downloadResponse.readableStreamBody.pipe(fileStream)
-                    .on('finish', resolve)
-                    .on('error', reject);
-            });
+        const containerClient = blobServiceClient.getContainerClient(sourceContainerName);
+        let blobs = containerClient.listBlobsFlat();
+        let latestBlob = null;
 
-            console.log(`✅ Imagen descargada: ${blobName}`);
+        for await (const blob of blobs) {
+            latestBlob = blob.name;
         }
+
+        if (!latestBlob) {
+            console.log("❌ No se encontraron imágenes en el contenedor.");
+            return;
+        }
+
+        console.log(`📥 Descargando imagen: ${latestBlob}...`);
+        const blockBlobClient = containerClient.getBlobClient(latestBlob);
+        const downloadResponse = await blockBlobClient.download();
+
+        const filePath = `./${latestBlob}`;
+        const fileStream = fs.createWriteStream(filePath);
+        await new Promise((resolve, reject) => {
+            downloadResponse.readableStreamBody.pipe(fileStream);
+            downloadResponse.readableStreamBody.on('end', resolve);
+            downloadResponse.readableStreamBody.on('error', reject);
+        });
+
+        console.log(`✅ Imagen descargada y guardada como ${filePath}`);
     } catch (error) {
-        console.error("❌ Error al descargar imágenes:", error);
+        console.error("❌ Error al descargar la imagen:", error.message);
     }
 }
 
-downloadImages();
+downloadLatestBlob();
