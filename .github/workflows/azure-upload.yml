@@ -3,7 +3,7 @@ name: Procesar imágenes y subirlas a Azure
 on:
   push:
     paths:
-      - "images/**"
+      - "imagenes/**"
     branches:
       - main
 
