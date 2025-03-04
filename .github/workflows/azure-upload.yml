@@ -1,9 +1,9 @@
 name: Procesar imágenes y subirlas a Azure
 
 on:
-  workflow_dispatch:  # HABILITA TRIGGER MANUAL
-  repository_dispatch:  # HABILITA DISPARO DESDE API
-    types: [blob_created]  # Evento personalizado
+  workflow_dispatch:  # Activación manual desde API
+  repository_dispatch:  # Evento personalizado desde Logic Apps
+    types: [blob_created]  # Nombre del evento
 
 jobs:
   process_images:
@@ -20,15 +20,6 @@ jobs:
 
       - name: Instalar dependencias
         run: npm install
-
-      - name: Configurar variables
-        run: |
-          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" >> .env
-          echo "AZURE_STORAGE_CONTAINER_NAME_SOURCE=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_SOURCE }}" >> .env
-          echo "AZURE_STORAGE_CONTAINER_NAME_RAW=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_RAW }}" >> .env
-          echo "AZURE_STORAGE_CONTAINER_NAME_OPTIMIZED=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_OPTIMIZED }}" >> .env
-          echo "AZURE_STORAGE_SAS_TOKEN=${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" >> .env
-          echo "AZURE_STORAGE_BLOB_URL=${{ secrets.AZURE_STORAGE_BLOB_URL }}" >> .env
 
       - name: Ejecutar procesamiento de imágenes
         run: |
