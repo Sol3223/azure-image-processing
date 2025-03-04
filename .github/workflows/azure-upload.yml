@@ -1,8 +1,9 @@
 name: Procesar imágenes y subirlas a Azure
 
 on:
-  repository_dispatch:
-    types: [blob_created]  # Evento personalizado que activará el workflow
+  workflow_dispatch:  # HABILITA TRIGGER MANUAL
+  repository_dispatch:  # HABILITA DISPARO DESDE API
+    types: [blob_created]  # Evento personalizado
 
 jobs:
   process_images:
