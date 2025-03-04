@@ -20,7 +20,13 @@ jobs:
 
       - name: Instalar dependencias
         run: npm install
-
+      - name: Verificar variables de entorno
+        run: |
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}"
+          echo "AZURE_STORAGE_BLOB_URL=${{ secrets.AZURE_STORAGE_BLOB_URL }}"
+          echo "AZURE_STORAGE_CONTAINER_NAME_SOURCE=${{ secrets.AZURE_STORAGE_CONTAINER_NAME_SOURCE }}"
+          echo "AZURE_STORAGE_SAS_TOKEN=${{ secrets.AZURE_STORAGE_SAS_TOKEN }}"
+      
       - name: Ejecutar procesamiento de imágenes
         run: |
           node scripts/download.js
